@@ -1,0 +1,16 @@
+IMAGENS DE DOCUMENTAÇÃO — FASE 1 — ADVENTUREWORKSDW / POWER BI
+
+01 - Planejamento da Fase 1 no Microsoft Loop.
+02 - Verificação inicial no SSMS: AdventureWorksDW ainda não restaurado.
+03 - AdventureWorksDW2025 restaurado, ONLINE, compatibility level 170.
+04 - Listagem das tabelas base do AdventureWorksDW2025.
+05 - Validação das 8 tabelas selecionadas para o dashboard.
+06 - Validação da FactInternetSales com 60.398 registros.
+07 - Power BI Desktop aberto.
+08 - Seleção do conector SQL Server no Power BI.
+09 - Parâmetros de conexão: localhost / AdventureWorksDW2025 / Importar.
+10 - Autenticação Windows para acesso ao SQL Server.
+11 - Navegador do Power BI com as 8 tabelas selecionadas.
+12 - Editor do Power Query exibindo a FactInternetSales.
+
+Arquivos organizados a partir das capturas enviadas durante a execução da Fase 1.
