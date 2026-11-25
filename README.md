@@ -2,7 +2,7 @@
 
 Projeto acadêmico desenvolvido para a **Demonstração de Competência**, com foco na construção de um dashboard analítico utilizando o **AdventureWorks Data Warehouse**, Microsoft SQL Server e Power BI.
 
-O projeto tem como objetivo aplicar conceitos de:
+O projeto aplica conceitos de:
 
 - construção de KPIs;
 - modelagem dimensional;
@@ -15,9 +15,9 @@ O projeto tem como objetivo aplicar conceitos de:
 
 ## Objetivo
 
-Desenvolver um dashboard no **Power BI** utilizando a base **AdventureWorksDW2025**, contendo no mínimo **10 indicadores de negócio relevantes**, capazes de apresentar o desempenho das vendas e apoiar análises sobre produtos, clientes, períodos e territórios.
+Desenvolver um dashboard no **Power BI** utilizando a base **AdventureWorksDW2025**, contendo no mínimo **10 indicadores de negócio relevantes** para acompanhar o desempenho das vendas e apoiar análises sobre produtos, clientes, períodos e territórios.
 
-Além da construção do dashboard, o projeto contempla a identificação de insights e a preparação de uma apresentação individual utilizando conceitos de **Data Storytelling**.
+O dashboard foi estruturado para permitir uma navegação do panorama geral para análises específicas de produtos, clientes e geografia, mantendo filtros sincronizados entre as páginas analíticas.
 
 ---
 
@@ -36,30 +36,32 @@ Além da construção do dashboard, o projeto contempla a identificação de ins
 
 ## Arquitetura
 
-O projeto utiliza diretamente o Data Warehouse oficial do AdventureWorks armazenado no SQL Server.
+O projeto utiliza diretamente o Data Warehouse AdventureWorks armazenado no SQL Server.
 
 ```text
 AdventureWorksDW2025
-      SQL Server
-          │
-          │ Importação
-          ▼
-      Power Query
-          │
-          │ Tratamento
-          ▼
-     Modelo Power BI
-          │
-          ├── Relacionamentos
-          ├── Medidas DAX
-          ├── KPIs
-          └── Hierarquias
-          │
-          ▼
-       Dashboard
-          │
-          ▼
-  Insights e Storytelling
+        │
+        ▼
+   SQL Server
+        │
+        │ Importação
+        ▼
+   Power Query
+        │
+        │ Tratamento
+        ▼
+ Modelo Power BI
+        │
+        ├── Relacionamentos
+        ├── Medidas DAX
+        ├── KPIs
+        └── Hierarquias
+        │
+        ▼
+    Dashboard
+        │
+        ▼
+ Insights e Storytelling
 ```
 
 ---
@@ -74,17 +76,13 @@ AdventureWorksDW2025
 
 O banco foi restaurado localmente no SQL Server e validado antes da conexão com o Power BI.
 
-Durante a validação foi confirmado que a tabela principal de vendas:
+A tabela fato principal utilizada no projeto é:
 
 ```text
 dbo.FactInternetSales
 ```
 
-possui:
-
-```text
-60.398 registros
-```
+Ela contém os registros das vendas realizadas pela Internet e fornece as medidas utilizadas nos principais indicadores do dashboard.
 
 ---
 
@@ -98,7 +96,7 @@ A tabela fato principal é:
 FactInternetSales
 ```
 
-Ela registra os itens dos pedidos realizados pela Internet e contém medidas importantes como:
+Ela registra os itens dos pedidos e contém informações como:
 
 ```text
 OrderQuantity
@@ -112,13 +110,11 @@ TaxAmt
 Freight
 ```
 
-Também possui chaves para relacionamento com as dimensões de produto, cliente, tempo e território.
+As dimensões fornecem contexto para análises por período, cliente, produto e território.
 
 ---
 
-## Tabelas utilizadas
-
-Foram selecionadas oito tabelas do AdventureWorksDW2025.
+## Tabelas utilizadas no modelo final
 
 ### Tabela fato
 
@@ -126,7 +122,7 @@ Foram selecionadas oito tabelas do AdventureWorksDW2025.
 FactInternetSales
 ```
 
-Responsável por armazenar os eventos de venda e os valores utilizados para os principais indicadores.
+Responsável pelos eventos de venda e pelas medidas utilizadas nos indicadores.
 
 ### Dimensão de tempo
 
@@ -134,7 +130,7 @@ Responsável por armazenar os eventos de venda e os valores utilizados para os p
 DimDate
 ```
 
-Permite análises por data, mês, trimestre, ano e ano fiscal.
+Permite análises por ano, trimestre, mês e dia.
 
 ### Dimensão de clientes
 
@@ -142,15 +138,7 @@ Permite análises por data, mês, trimestre, ano e ano fiscal.
 DimCustomer
 ```
 
-Contém informações sobre gênero, renda, estado civil, educação, ocupação, número de filhos, quantidade de veículos e data da primeira compra.
-
-### Dimensão geográfica
-
-```text
-DimGeography
-```
-
-Permite analisar clientes por país, estado ou província, cidade, código postal e território comercial.
+Contém informações utilizadas nas análises de clientes, incluindo país, ocupação e dados de identificação do cliente.
 
 ### Dimensão de produtos
 
@@ -158,107 +146,244 @@ Permite analisar clientes por país, estado ou província, cidade, código posta
 DimProduct
 ```
 
-Contém informações sobre produto, custo, preço, cor, tamanho, modelo e subcategoria.
+Concentra os atributos utilizados nas análises de produto, incluindo produto, categoria e subcategoria.
 
-### Subcategoria de produtos
-
-```text
-DimProductSubcategory
-```
-
-Permite organizar os produtos em níveis intermediários, como Mountain Bikes, Road Bikes, Touring Bikes, Helmets e Tires and Tubes.
-
-### Categoria de produtos
-
-```text
-DimProductCategory
-```
-
-As principais categorias presentes no banco são Bikes, Components, Clothing e Accessories.
-
-### Território de vendas
+### Dimensão de território de vendas
 
 ```text
 DimSalesTerritory
 ```
 
-Permite analisar o desempenho comercial por região, país e agrupamento territorial.
+Fornece contexto territorial para as análises geográficas e comerciais.
 
 ---
 
 # Estrutura dimensional
 
+O modelo final foi organizado com a tabela `FactInternetSales` no centro das análises e as dimensões relacionadas diretamente à fato.
+
 ```text
-                           DimDate
-                              │
-                              │
-                              ▼
-DimCustomer ──────── FactInternetSales ──────── DimProduct
-     │                        │                       │
-     │                        │                       ▼
-     ▼                        ▼             DimProductSubcategory
-DimGeography          DimSalesTerritory              │
-                                                    ▼
-                                           DimProductCategory
+                     DimDate
+                        │
+                        │
+                        ▼
+DimCustomer ───── FactInternetSales ───── DimProduct
+                        │
+                        ▼
+                DimSalesTerritory
 ```
 
-A estrutura combina características de **Star Schema** e **Snowflake Schema**.
-
-A tabela `FactInternetSales` permanece no centro das análises, enquanto as dimensões fornecem contexto para responder perguntas como quando ocorreu a venda, quem realizou a compra, onde o cliente está localizado, qual produto foi comprado, a qual categoria ele pertence e em qual território ocorreu a venda.
+Essa organização facilita o uso das medidas DAX e mantém uma estrutura dimensional simples para as análises realizadas no Power BI.
 
 ---
 
-# Indicadores planejados
+# KPIs e medidas desenvolvidas
 
-O dashboard deverá possuir pelo menos dez KPIs:
+O requisito do trabalho era possuir no mínimo **10 indicadores relevantes**.
+
+A versão final utiliza os seguintes indicadores principais:
 
 1. **Receita Total**
 2. **Lucro Bruto**
 3. **Margem Bruta %**
-4. **Quantidade de Pedidos**
-5. **Ticket Médio**
-6. **Unidades Vendidas**
-7. **Clientes Únicos**
-8. **Taxa de Clientes Recorrentes**
-9. **Crescimento de Receita YoY**
-10. **Prazo Médio de Envio**
+4. **Ticket Médio**
+5. **Crescimento da Receita YoY %**
+6. **Itens Vendidos**
+7. **Receita Média por Item**
+8. **Clientes Ativos**
+9. **Receita por Cliente**
+10. **Quantidade de Pedidos**
 
-Os indicadores poderão ser refinados durante a etapa de implementação das medidas DAX.
+Também foram utilizadas medidas auxiliares, como:
+
+- **Receita Ano Anterior**
+- **Estado/Província Líder**
+
+A medida de Receita Média por Item foi definida como:
+
+```DAX
+Receita Média por Item =
+DIVIDE(
+    [Receita Total],
+    [Itens Vendidos],
+    0
+)
+```
 
 ---
 
-# Estrutura planejada do dashboard
+# Estrutura final do dashboard
 
-## 1. Visão Executiva
+O relatório foi organizado em cinco páginas.
 
-Principais indicadores: Receita, Lucro, Margem, Pedidos e Ticket médio.
+## 1. Capa
 
-Análises: evolução temporal, receita por categoria e desempenho por território.
+Página inicial com identidade visual do projeto e identificação do aluno.
 
-## 2. Produtos e Clientes
+## 2. Visão Geral
 
-Análises previstas: produtos com maior receita, categorias e subcategorias, quantidade vendida, clientes únicos, perfil dos clientes, comportamento de compra e distribuição geográfica.
+Apresenta uma visão executiva do desempenho comercial.
 
-## 3. Tendências e Desempenho
+### KPIs
 
-Análises previstas: crescimento anual, comparação entre períodos, evolução de receita, evolução de margem, desempenho territorial e prazo de envio.
+- Receita Total
+- Ticket Médio
+- Crescimento YoY
+- Margem Bruta
+- Lucro Bruto
+
+### Análises
+
+- Evolução da Receita
+- Receita Atual x Ano Anterior
+- Receita por Categoria
+- Receita por País
+
+A análise temporal possui drill-down:
+
+```text
+Ano → Trimestre → Mês → Dia
+```
+
+---
+
+## 3. Análise de Produtos
+
+Página dedicada ao desempenho de categorias, subcategorias e produtos.
+
+### KPIs
+
+- Receita Total
+- Lucro Bruto
+- Margem Bruta
+- Itens Vendidos
+
+### Análises
+
+- Receita por Categoria
+- Principais Subcategorias por Receita
+- Principais Produtos por Receita
+- Receita Média por Item x Margem Bruta
+
+O gráfico de dispersão utiliza:
+
+```text
+Eixo X  → Receita Média por Item
+Eixo Y  → Margem Bruta %
+Tamanho → Itens Vendidos
+Detalhe → Produto
+```
+
+Também foram adicionadas linhas médias nos dois eixos para facilitar a identificação de produtos com:
+
+- alto valor médio e alta margem;
+- alto valor médio e baixa margem;
+- baixo valor médio e alta margem;
+- baixo valor médio e baixa margem.
+
+O segmentador de Categoria utiliza o filtro:
+
+```text
+Receita Total > 0
+```
+
+Isso impede a exibição de categorias sem vendas no contexto analisado.
+
+---
+
+## 4. Análise de Clientes
+
+Página dedicada ao perfil e comportamento da base de clientes.
+
+### KPIs
+
+- Ticket Médio
+- Clientes Ativos
+- Receita por Cliente
+- Quantidade de Pedidos
+
+### Análises
+
+- Principais Clientes por Receita
+- Receita por Ocupação
+
+Os eixos foram formatados de acordo com a escala de cada análise para evitar unidades inadequadas.
+
+---
+
+## 5. Análise Geográfica
+
+Página voltada à análise territorial das vendas.
+
+### KPIs
+
+- Estado/Província Líder
+- Receita Total
+
+### Análises
+
+- Principais Cidades por Receita
+- Receita x Lucro por Estado/Província
+- Receita por Região
+
+O mapa utiliza hierarquia geográfica e informações adicionais em tooltip, como:
+
+- Receita Total
+- Lucro Bruto
+- Margem Bruta %
+- Clientes Ativos
+
+---
+
+# Interatividade
+
+O dashboard utiliza segmentadores sincronizados entre as páginas analíticas.
+
+Os principais filtros globais são:
+
+- **Ano**
+- **País**
+
+Também há sincronização de **Categoria** entre as páginas em que esse filtro é relevante.
+
+Dessa forma, uma seleção realizada em uma página pode ser mantida durante a navegação pelo relatório, preservando o mesmo contexto de análise.
+
+Além disso, o dashboard utiliza:
+
+- drill-down temporal;
+- tooltips;
+- filtros entre visuais;
+- segmentadores;
+- formatação condicional;
+- linhas médias em gráfico de dispersão.
 
 ---
 
 # Data Storytelling
 
-Além de apresentar os indicadores, o dashboard será utilizado para construir uma narrativa baseada nos dados, buscando responder perguntas como:
+A estrutura das páginas foi organizada para construir uma sequência analítica:
 
-- Como está o desempenho geral da empresa?
-- As vendas estão crescendo?
-- Quais produtos geram mais receita?
-- Quais categorias apresentam maior participação?
-- Quais territórios apresentam melhor desempenho?
+```text
+Visão Geral
+    ↓
+Produtos
+    ↓
+Clientes
+    ↓
+Geografia
+```
+
+A narrativa busca responder às seguintes perguntas:
+
+- Como está o desempenho geral das vendas?
+- Como a receita evolui ao longo do tempo?
+- Quais categorias, subcategorias e produtos apresentam maior desempenho?
+- Como valor médio, margem e volume se relacionam entre os produtos?
 - Quem são os principais clientes?
-- Existem oportunidades de crescimento?
-- Quais decisões podem ser tomadas a partir desses dados?
+- Quais perfis de clientes concentram maior receita?
+- Quais países, estados e cidades apresentam maior desempenho comercial?
 
-O objetivo não é apenas apresentar gráficos, mas transformar os resultados em **insights capazes de apoiar decisões de negócio**.
+O objetivo é transformar os dados em informações úteis para apoiar a tomada de decisão.
 
 ---
 
@@ -268,76 +393,63 @@ O objetivo não é apenas apresentar gráficos, mas transformar os resultados em
 
 **Status:** ✅ Concluída
 
-Atividades realizadas:
-
 - restauração e validação do AdventureWorksDW2025;
-- confirmação do banco no SQL Server;
 - validação da `FactInternetSales`;
 - conexão do Power BI ao SQL Server;
-- seleção das tabelas;
-- análise inicial das dimensões e fato.
+- seleção inicial das tabelas;
+- análise das dimensões e fato.
 
 ## Fase 2 — Modelagem de Dados no Power BI
 
-**Status:** 🚧 Em desenvolvimento
+**Status:** ✅ Concluída
 
-Atividades:
-
-- revisar e preparar as tabelas no Power Query;
-- carregar os dados;
-- validar relacionamentos;
-- organizar o modelo dimensional;
-- configurar cardinalidades e filtros;
-- preparar dimensão de tempo;
-- criar hierarquias;
-- validar o modelo final.
+- tratamento das tabelas no Power Query;
+- revisão dos tipos de dados;
+- validação dos relacionamentos;
+- organização do modelo dimensional;
+- configuração da dimensão de tempo;
+- criação de hierarquias;
+- validação do modelo final.
 
 ## Fase 3 — Definição dos KPIs
 
-**Status:** ⬜ Não iniciada
+**Status:** ✅ Concluída
 
-- revisar os indicadores;
-- definir fórmulas;
-- justificar cada KPI;
-- relacionar indicadores às necessidades do negócio.
+- definição dos indicadores;
+- validação da relevância de cada KPI;
+- organização das medidas de negócio.
 
 ## Fase 4 — Medidas DAX
 
-**Status:** ⬜ Não iniciada
+**Status:** ✅ Concluída
 
 - criação das medidas;
 - testes dos cálculos;
-- validação dos resultados.
+- validação dos resultados;
+- criação de comparativos temporais e medidas auxiliares.
 
 ## Fase 5 — Dashboard
 
-**Status:** ⬜ Não iniciada
+**Status:** ✅ Concluída
 
-- construção das páginas;
+- criação das cinco páginas;
 - definição da identidade visual;
-- filtros;
-- segmentações;
-- interatividade;
-- drill-down.
+- construção dos gráficos;
+- criação dos segmentadores;
+- sincronização de filtros;
+- configuração de drill-down;
+- configuração de tooltips;
+- revisão de escalas, unidades e formatação.
 
 ## Fase 6 — Análise e Data Storytelling
 
-**Status:** ⬜ Não iniciada
+**Status:** ✅ Concluída
 
-- identificação de padrões;
-- geração de insights;
-- análise de oportunidades;
-- elaboração das recomendações;
-- construção da narrativa.
-
-## Fase 7 — Apresentação e defesa
-
-**Status:** ⬜ Não iniciada
-
-- preparação da apresentação;
-- roteiro de Data Storytelling;
-- revisão dos conceitos;
-- preparação para arguição.
+- organização da sequência analítica das páginas;
+- análise de produtos, clientes e geografia;
+- criação de comparativos;
+- refinamento do gráfico de dispersão;
+- revisão da experiência de navegação.
 
 ---
 
@@ -347,48 +459,46 @@ Atividades:
 adventureworks-powerbi-dashboard/
 │
 ├── docs/
-│   └── Ambiente e entendimento do AdventureWorksDW/
-│       ├── relatórios/
-│       └── documentação/
+│   └── documentação e evidências do projeto
 │
 ├── powerbi/
 │   └── AdventureWorks_Dashboard.pbix
 │
 ├── screenshots/
-│   └── evidências das etapas
+│   └── evidências das etapas e páginas do dashboard
 │
 └── README.md
 ```
 
-A estrutura poderá ser ampliada conforme o desenvolvimento das próximas fases.
-
 ---
 
-# Critérios avaliativos
+# Critérios do trabalho
 
-| Critério | Pontuação |
-|---|---:|
-| Construção dos KPIs | 6,0 |
-| Desenvolvimento do Dashboard | 6,0 |
-| Análise e Insights | 5,0 |
-| Data Storytelling e Apresentação | 5,0 |
-| Defesa do Projeto | 3,0 |
-| **Total** | **25,0** |
+O projeto foi desenvolvido considerando os seguintes aspectos:
+
+- construção de KPIs relevantes;
+- qualidade visual e organização do dashboard;
+- usabilidade e interatividade;
+- análise dos dados;
+- geração de insights;
+- aplicação de Data Storytelling.
+
+A versão final possui mais de 10 métricas e indicadores, identidade visual consistente e quatro perspectivas analíticas principais: visão geral, produtos, clientes e geografia.
 
 ---
 
 # Entrega
 
-Prazo considerado para o projeto:
-
-```text
-25/11/2026 — 18:00
-```
-
-Principal arquivo de entrega:
+Principal arquivo do projeto:
 
 ```text
 AdventureWorks_Dashboard.pbix
+```
+
+Status atual:
+
+```text
+Projeto concluído e pronto para entrega.
 ```
 
 ---
